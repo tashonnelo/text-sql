@@ -5,7 +5,7 @@ flowchart TD
     C -->|hi or no domain| Z([End])
     C -->|question| D[generate_sql]
     D -->|fail| Z
-    D -->|ok| E[validate_execute]
+    D -->|ok| E[vlaidate]
     E -->|error| D
     E -->|done| Z
 ```
