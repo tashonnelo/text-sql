@@ -1,9 +1,5 @@
 [
   {
-    "q": "list open tickets",
-    "a": "status, ticket_count\nclosed, 1\nopen, 2"
-  },
-  {
     "q": "hello",
     "a": "Hi! Ask me a data question."
   },
@@ -18,5 +14,9 @@
   {
     "q": "hello",
     "a": "Hi! Ask me a data question."
+  },
+  {
+    "q": "history",
+    "a": "1. list open tickets -> status, ticket_count\nclosed, 1\nopen, 2\n2. hello -> Hi! Ask me a data question.\n3. what is total sales by channel -> channel, total_sales\nOnline, 2450.0\nRetail, 85.0\n4. list open tickets -> status, ticket_count\nclosed, 1\nopen, 2\n5. hello -> Hi! Ask me a data question."
   }
 ]
