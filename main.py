@@ -2,22 +2,14 @@ import argparse
 import json
 import os
 import sqlite3
-import time
 from pathlib import Path
 from typing import Any, TypedDict
 
 from langgraph.graph import END, START, StateGraph
 
-try:
-    import matplotlib.pyplot as plt
-except Exception:
-    plt = None
-
 
 DB = Path("demo.sqlite")
 MEM = Path("memory.json")
-CHARTS = Path("charts")
-CHARTS.mkdir(exist_ok=True)
 
 DOMAINS = {
     "sales": ["sales_orders", "sales_order_items", "sales_products", "sales_channels"],
@@ -56,8 +48,6 @@ class S(TypedDict, total=False):
     rows: list[dict[str, Any]]
     answer: str
     error: str
-    wants_chart: bool
-    chart: str
     history: list[dict[str, str]]
     retry: int
 
@@ -132,29 +122,6 @@ def llm_sql(q: str, d: str) -> str:
         return rule_sql(q, d)
 
 
-def chart(rows: list[dict[str, Any]]) -> str:
-    if not plt or not rows:
-        return ""
-    ks = list(rows[0].keys())
-    if len(ks) < 2:
-        return ""
-    xk, yk = ks[0], ks[1]
-    xs, ys = [], []
-    for r in rows:
-        if isinstance(r.get(yk), (int, float)):
-            xs.append(str(r.get(xk)))
-            ys.append(float(r.get(yk)))
-    if not xs:
-        return ""
-    p = CHARTS / f"chart_{int(time.time())}.png"
-    plt.figure(figsize=(6, 3))
-    plt.bar(xs, ys)
-    plt.tight_layout()
-    plt.savefig(p)
-    plt.close()
-    return str(p)
-
-
 def select_domain(st: S) -> S:
     q = st.get("question", "").lower()
     d = st.get("domain", "")
@@ -178,10 +145,10 @@ def parse_intent(st: S) -> S:
         s = "\n".join([f"{i+1}. {x['q']} -> {x['a'][:70]}" for i, x in enumerate(h)])
         return {**st, "intent": "memory", "answer": s}
     if "list tables" in q or q == "tables":
-        return {**st, "intent": "tables", "wants_chart": False}
+        return {**st, "intent": "tables"}
     if "show table" in q:
-        return {**st, "intent": "show", "wants_chart": False}
-    return {**st, "intent": "query", "wants_chart": ("chart" in q or "plot" in q or "graph" in q)}
+        return {**st, "intent": "show"}
+    return {**st, "intent": "query"}
 
 
 def generate_sql(st: S) -> S:
@@ -228,13 +195,7 @@ def validate_execute(st: S) -> S:
         body = [", ".join(str(v) for v in r.values()) for r in rows[:5]]
         ans = "\n".join([head] + body)
 
-    cp = ""
-    if st.get("wants_chart"):
-        cp = chart(rows)
-        if cp:
-            ans += f"\nChart: {cp}"
-
-    return {**st, "rows": rows, "answer": ans, "error": "", "chart": cp}
+    return {**st, "rows": rows, "answer": ans, "error": ""}
 
 
 def r1(st: S) -> str:
@@ -275,7 +236,7 @@ def run_demo() -> None:
     print(MERMAID)
 
     tests = [
-        ("sales", "what is total sales by channel and make a chart"),
+        ("sales", "what is total sales by channel"),
         ("support", "list open tickets"),
         ("finance", "hello"),
     ]
