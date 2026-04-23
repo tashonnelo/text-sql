@@ -1,0 +1,22 @@
+[
+  {
+    "q": "list open tickets",
+    "a": "status, ticket_count\nclosed, 1\nopen, 2"
+  },
+  {
+    "q": "hello",
+    "a": "Hi! Ask me a data question."
+  },
+  {
+    "q": "what is total sales by channel and make a chart",
+    "a": "channel, total_sales\nOnline, 2450.0\nRetail, 85.0\nChart: charts/chart_1776941302.png"
+  },
+  {
+    "q": "list open tickets",
+    "a": "status, ticket_count\nclosed, 1\nopen, 2"
+  },
+  {
+    "q": "hello",
+    "a": "Hi! Ask me a data question."
+  }
+]
